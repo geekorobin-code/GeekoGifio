@@ -1,27 +1,14 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+<link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon.png">
+<link rel="apple-touch-icon" href="favicon.png">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>GeekoGifio — Créer et monter des GIF pour écrans LED pixel</title>
+<title>GeekoGifio</title>
 <meta name="description" content="Montage de GIF pour écrans LED pixel — glisser-déposer, tout dans le navigateur">
-<meta name="keywords" content="GIF, montage GIF, écran LED pixel, écran LED, convertisseur vidéo GIF, créateur de GIF, animation pixel art, GIF maker, LED matrix">
-<meta name="author" content="GeekoGifio">
-<meta name="robots" content="index, follow">
-
-<meta property="og:type" content="website">
-<meta property="og:title" content="GeekoGifio — Créer et monter des GIF pour écrans LED pixel">
-<meta property="og:description" content="Monte, rogne, découpe et convertis tes GIF pour écrans LED pixel — tout se passe dans le navigateur, rien n'est envoyé sur un serveur.">
-<meta property="og:site_name" content="GeekoGifio">
-
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="GeekoGifio — Créer et monter des GIF pour écrans LED pixel">
-<meta name="twitter:description" content="Monte, rogne, découpe et convertis tes GIF pour écrans LED pixel, directement dans le navigateur.">
-
 <meta name="theme-color" content="#5B5FA8">
-<link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjogIkdlZWtvR2lmaW8iLCAic2hvcnRfbmFtZSI6ICJHZWVrb0dpZmlvIiwgImRlc2NyaXB0aW9uIjogIk1vbnRhZ2UgZGUgR0lGIHBvdXIgXHUwMGU5Y3JhbnMgTEVEIHBpeGVsIFx1MjAxNCBnbGlzc2VyLWRcdTAwZTlwb3NlciwgdG91dCBkYW5zIGxlIG5hdmlnYXRldXIiLCAic3RhcnRfdXJsIjogIi4iLCAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwgImJhY2tncm91bmRfY29sb3IiOiAiI0Y0RjRGNyIsICJ0aGVtZV9jb2xvciI6ICIjNUI1RkE4IiwgIm9yaWVudGF0aW9uIjogImFueSIsICJpY29ucyI6IFt7InNyYyI6ICJkYXRhOmltYWdlL3N2Zyt4bWw7YmFzZTY0LFBITjJaeUI0Yld4dWN6MGlhSFIwY0RvdkwzZDNkeTUzTXk1dmNtY3ZNakF3TUM5emRtY2lJSFpwWlhkQ2IzZzlJakFnTUNBMU1USWdOVEV5SWo0S1BHUmxabk0rUEd4cGJtVmhja2R5WVdScFpXNTBJR2xrUFNKbklpQjRNVDBpTUNJZ2VURTlJakFpSUhneVBTSXhJaUI1TWowaU1TSStDanh6ZEc5d0lHOW1abk5sZEQwaU1DSWdjM1J2Y0MxamIyeHZjajBpSXpWQ05VWkJPQ0l2UGp4emRHOXdJRzltWm5ObGREMGlNU0lnYzNSdmNDMWpiMnh2Y2owaUl6ZEVPRGxDTUNJdlBnbzhMMnhwYm1WaGNrZHlZV1JwWlc1MFBqd3ZaR1ZtY3o0S1BISmxZM1FnZDJsa2RHZzlJalV4TWlJZ2FHVnBaMmgwUFNJMU1USWlJSEo0UFNJeE1qQWlJR1pwYkd3OUluVnliQ2dqWnlraUx6NEtQR05wY21Oc1pTQmplRDBpTWpVMklpQmplVDBpTWpVMklpQnlQU0l4TlRBaUlHWnBiR3c5SWlObVptWm1abVlpTHo0S1BIQmhkR2dnWkQwaVRUSXhOaUF4TnpZZ1RESXhOaUF6TXpZZ1RETTFOaUF5TlRZZ1dpSWdabWxzYkQwaWRYSnNLQ05uS1NJdlBnbzhMM04yWno0PSIsICJzaXplcyI6ICI1MTJ4NTEyIiwgInR5cGUiOiAiaW1hZ2Uvc3ZnK3htbCIsICJwdXJwb3NlIjogImFueSJ9LCB7InNyYyI6ICJkYXRhOmltYWdlL3N2Zyt4bWw7YmFzZTY0LFBITjJaeUI0Yld4dWN6MGlhSFIwY0RvdkwzZDNkeTUzTXk1dmNtY3ZNakF3TUM5emRtY2lJSFpwWlhkQ2IzZzlJakFnTUNBMU1USWdOVEV5SWo0S1BHUmxabk0rUEd4cGJtVmhja2R5WVdScFpXNTBJR2xrUFNKbklpQjRNVDBpTUNJZ2VURTlJakFpSUhneVBTSXhJaUI1TWowaU1TSStDanh6ZEc5d0lHOW1abk5sZEQwaU1DSWdjM1J2Y0MxamIyeHZjajBpSXpWQ05VWkJPQ0l2UGp4emRHOXdJRzltWm5ObGREMGlNU0lnYzNSdmNDMWpiMnh2Y2owaUl6ZEVPRGxDTUNJdlBnbzhMMnhwYm1WaGNrZHlZV1JwWlc1MFBqd3ZaR1ZtY3o0S1BISmxZM1FnZDJsa2RHZzlJalV4TWlJZ2FHVnBaMmgwUFNJMU1USWlJSEo0UFNJeE1qQWlJR1pwYkd3OUluVnliQ2dqWnlraUx6NEtQR05wY21Oc1pTQmplRDBpTWpVMklpQmplVDBpTWpVMklpQnlQU0l4TlRBaUlHWnBiR3c5SWlObVptWm1abVlpTHo0S1BIQmhkR2dnWkQwaVRUSXhOaUF4TnpZZ1RESXhOaUF6TXpZZ1RETTFOaUF5TlRZZ1dpSWdabWxzYkQwaWRYSnNLQ05uS1NJdlBnbzhMM04yWno0PSIsICJzaXplcyI6ICI1MTJ4NTEyIiwgInR5cGUiOiAiaW1hZ2Uvc3ZnK3htbCIsICJwdXJwb3NlIjogIm1hc2thYmxlIn1dfQ==">
-<link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj4KPGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+CjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzVCNUZBOCIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzdEODlCMCIvPgo8L2xpbmVhckdyYWRpZW50PjwvZGVmcz4KPHJlY3Qgd2lkdGg9IjUxMiIgaGVpZ2h0PSI1MTIiIHJ4PSIxMjAiIGZpbGw9InVybCgjZykiLz4KPGNpcmNsZSBjeD0iMjU2IiBjeT0iMjU2IiByPSIxNTAiIGZpbGw9IiNmZmZmZmYiLz4KPHBhdGggZD0iTTIxNiAxNzYgTDIxNiAzMzYgTDM1NiAyNTYgWiIgZmlsbD0idXJsKCNnKSIvPgo8L3N2Zz4=">
-<link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj4KPGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+CjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzVCNUZBOCIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzdEODlCMCIvPgo8L2xpbmVhckdyYWRpZW50PjwvZGVmcz4KPHJlY3Qgd2lkdGg9IjUxMiIgaGVpZ2h0PSI1MTIiIHJ4PSIxMjAiIGZpbGw9InVybCgjZykiLz4KPGNpcmNsZSBjeD0iMjU2IiBjeT0iMjU2IiByPSIxNTAiIGZpbGw9IiNmZmZmZmYiLz4KPHBhdGggZD0iTTIxNiAxNzYgTDIxNiAzMzYgTDM1NiAyNTYgWiIgZmlsbD0idXJsKCNnKSIvPgo8L3N2Zz4=">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
