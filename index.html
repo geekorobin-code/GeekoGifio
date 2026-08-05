@@ -1,14 +1,27 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
-<link rel="icon" type="image/png" sizes="16x16" href="favicon.png">
-<link rel="apple-touch-icon" href="favicon.png">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>GeekoGifio</title>
+<title>GeekoGifio — Créer et monter des GIF pour écrans LED pixel</title>
 <meta name="description" content="Montage de GIF pour écrans LED pixel — glisser-déposer, tout dans le navigateur">
+<meta name="keywords" content="GIF, montage GIF, écran LED pixel, écran LED, convertisseur vidéo GIF, créateur de GIF, animation pixel art, GIF maker, LED matrix">
+<meta name="author" content="GeekoGifio">
+<meta name="robots" content="index, follow">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="GeekoGifio — Créer et monter des GIF pour écrans LED pixel">
+<meta property="og:description" content="Monte, rogne, découpe et convertis tes GIF pour écrans LED pixel — tout se passe dans le navigateur, rien n'est envoyé sur un serveur.">
+<meta property="og:site_name" content="GeekoGifio">
+
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="GeekoGifio — Créer et monter des GIF pour écrans LED pixel">
+<meta name="twitter:description" content="Monte, rogne, découpe et convertis tes GIF pour écrans LED pixel, directement dans le navigateur.">
+
 <meta name="theme-color" content="#5B5FA8">
+<link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjogIkdlZWtvR2lmaW8iLCAic2hvcnRfbmFtZSI6ICJHZWVrb0dpZmlvIiwgImRlc2NyaXB0aW9uIjogIk1vbnRhZ2UgZGUgR0lGIHBvdXIgXHUwMGU5Y3JhbnMgTEVEIHBpeGVsIFx1MjAxNCBnbGlzc2VyLWRcdTAwZTlwb3NlciwgdG91dCBkYW5zIGxlIG5hdmlnYXRldXIiLCAic3RhcnRfdXJsIjogIi4iLCAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwgImJhY2tncm91bmRfY29sb3IiOiAiI0Y0RjRGNyIsICJ0aGVtZV9jb2xvciI6ICIjNUI1RkE4IiwgIm9yaWVudGF0aW9uIjogImFueSIsICJpY29ucyI6IFt7InNyYyI6ICJkYXRhOmltYWdlL3N2Zyt4bWw7YmFzZTY0LFBITjJaeUI0Yld4dWN6MGlhSFIwY0RvdkwzZDNkeTUzTXk1dmNtY3ZNakF3TUM5emRtY2lJSFpwWlhkQ2IzZzlJakFnTUNBMU1USWdOVEV5SWo0S1BHUmxabk0rUEd4cGJtVmhja2R5WVdScFpXNTBJR2xrUFNKbklpQjRNVDBpTUNJZ2VURTlJakFpSUhneVBTSXhJaUI1TWowaU1TSStDanh6ZEc5d0lHOW1abk5sZEQwaU1DSWdjM1J2Y0MxamIyeHZjajBpSXpWQ05VWkJPQ0l2UGp4emRHOXdJRzltWm5ObGREMGlNU0lnYzNSdmNDMWpiMnh2Y2owaUl6ZEVPRGxDTUNJdlBnbzhMMnhwYm1WaGNrZHlZV1JwWlc1MFBqd3ZaR1ZtY3o0S1BISmxZM1FnZDJsa2RHZzlJalV4TWlJZ2FHVnBaMmgwUFNJMU1USWlJSEo0UFNJeE1qQWlJR1pwYkd3OUluVnliQ2dqWnlraUx6NEtQR05wY21Oc1pTQmplRDBpTWpVMklpQmplVDBpTWpVMklpQnlQU0l4TlRBaUlHWnBiR3c5SWlObVptWm1abVlpTHo0S1BIQmhkR2dnWkQwaVRUSXhOaUF4TnpZZ1RESXhOaUF6TXpZZ1RETTFOaUF5TlRZZ1dpSWdabWxzYkQwaWRYSnNLQ05uS1NJdlBnbzhMM04yWno0PSIsICJzaXplcyI6ICI1MTJ4NTEyIiwgInR5cGUiOiAiaW1hZ2Uvc3ZnK3htbCIsICJwdXJwb3NlIjogImFueSJ9LCB7InNyYyI6ICJkYXRhOmltYWdlL3N2Zyt4bWw7YmFzZTY0LFBITjJaeUI0Yld4dWN6MGlhSFIwY0RvdkwzZDNkeTUzTXk1dmNtY3ZNakF3TUM5emRtY2lJSFpwWlhkQ2IzZzlJakFnTUNBMU1USWdOVEV5SWo0S1BHUmxabk0rUEd4cGJtVmhja2R5WVdScFpXNTBJR2xrUFNKbklpQjRNVDBpTUNJZ2VURTlJakFpSUhneVBTSXhJaUI1TWowaU1TSStDanh6ZEc5d0lHOW1abk5sZEQwaU1DSWdjM1J2Y0MxamIyeHZjajBpSXpWQ05VWkJPQ0l2UGp4emRHOXdJRzltWm5ObGREMGlNU0lnYzNSdmNDMWpiMnh2Y2owaUl6ZEVPRGxDTUNJdlBnbzhMMnhwYm1WaGNrZHlZV1JwWlc1MFBqd3ZaR1ZtY3o0S1BISmxZM1FnZDJsa2RHZzlJalV4TWlJZ2FHVnBaMmgwUFNJMU1USWlJSEo0UFNJeE1qQWlJR1pwYkd3OUluVnliQ2dqWnlraUx6NEtQR05wY21Oc1pTQmplRDBpTWpVMklpQmplVDBpTWpVMklpQnlQU0l4TlRBaUlHWnBiR3c5SWlObVptWm1abVlpTHo0S1BIQmhkR2dnWkQwaVRUSXhOaUF4TnpZZ1RESXhOaUF6TXpZZ1RETTFOaUF5TlRZZ1dpSWdabWxzYkQwaWRYSnNLQ05uS1NJdlBnbzhMM04yWno0PSIsICJzaXplcyI6ICI1MTJ4NTEyIiwgInR5cGUiOiAiaW1hZ2Uvc3ZnK3htbCIsICJwdXJwb3NlIjogIm1hc2thYmxlIn1dfQ==">
+<link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj4KPGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+CjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzVCNUZBOCIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzdEODlCMCIvPgo8L2xpbmVhckdyYWRpZW50PjwvZGVmcz4KPHJlY3Qgd2lkdGg9IjUxMiIgaGVpZ2h0PSI1MTIiIHJ4PSIxMjAiIGZpbGw9InVybCgjZykiLz4KPGNpcmNsZSBjeD0iMjU2IiBjeT0iMjU2IiByPSIxNTAiIGZpbGw9IiNmZmZmZmYiLz4KPHBhdGggZD0iTTIxNiAxNzYgTDIxNiAzMzYgTDM1NiAyNTYgWiIgZmlsbD0idXJsKCNnKSIvPgo8L3N2Zz4=">
+<link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj4KPGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+CjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzVCNUZBOCIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzdEODlCMCIvPgo8L2xpbmVhckdyYWRpZW50PjwvZGVmcz4KPHJlY3Qgd2lkdGg9IjUxMiIgaGVpZ2h0PSI1MTIiIHJ4PSIxMjAiIGZpbGw9InVybCgjZykiLz4KPGNpcmNsZSBjeD0iMjU2IiBjeT0iMjU2IiByPSIxNTAiIGZpbGw9IiNmZmZmZmYiLz4KPHBhdGggZD0iTTIxNiAxNzYgTDIxNiAzMzYgTDM1NiAyNTYgWiIgZmlsbD0idXJsKCNnKSIvPgo8L3N2Zz4=">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -16,7 +29,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.js"></script>
 <style>
   :root{
     --bg:#F4F4F7;
@@ -158,6 +170,22 @@
     transition:border-color .15s, color .15s, box-shadow .15s;
   }
   .feedback-btn:hover{border-color:var(--mint-deep);color:var(--mint-deep); box-shadow:var(--m3-elev-1);}
+  .nav-link{
+    font-family:'Roboto',sans-serif;
+    font-size:12.5px;
+    font-weight:700;
+    padding:9px 14px;
+    border-radius:var(--m3-shape-full);
+    background:var(--panel-alt);
+    border:2px solid var(--border);
+    color:var(--text);
+    text-decoration:none;
+    cursor:pointer;
+    display:inline-flex;
+    align-items:center;
+    transition:border-color .15s, color .15s, box-shadow .15s;
+  }
+  .nav-link:hover{border-color:var(--pink-deep);color:var(--pink-deep); box-shadow:var(--m3-elev-1);}
   .donate-btn{
     font-family:'Roboto',sans-serif;
     font-size:12.5px;
@@ -1279,6 +1307,7 @@
 
 <header class="topbar">
   <div class="brand"><span class="dot"></span>Geeko<span>Gifio</span></div>
+  <a class="nav-link" href="https://geekorobin-code.github.io/GeekoMontage/">🎬 GeekoMontage</a>
   <button id="themeToggle" class="ghost theme-toggle" title="Thème clair / sombre">🌙</button>
   <select id="langSelect" class="lang-select" title="Langue / Language">
     <option value="fr">🇫🇷 Français</option>
@@ -2129,7 +2158,7 @@
         const cutLen = Math.max(0, (clip.cutEnd||0) - (clip.cutStart||0));
         const effectiveNative = Math.max(0.05, (clip.totalNativeMs - cutLen) / 1000);
         const isTrimmed = cutLen > 0;
-        const loops = clip.duration / effectiveNative;
+        const loops = (clip.duration * (clip.speed||1)) / effectiveNative;
         const trimNote = isTrimmed ? ` · ✂ coupé à ${effectiveNative.toFixed(2)}s` : '';
         hintEl.textContent = `GIF natif : ${clip.nativeDuration.toFixed(2)}s (${clip.frameCount||'?'} img)${trimNote} · sera vu ≈ ${loops.toFixed(1)}× à ${clip.duration.toFixed(1)}s`;
       }
@@ -2139,7 +2168,7 @@
         repeatInputEl.value = n;
         const cutLen = Math.max(0, (clip.cutEnd||0) - (clip.cutStart||0));
         const effectiveNative = Math.max(0.05, (clip.totalNativeMs - cutLen) / 1000);
-        clip.duration = Math.max(0.2, Math.round(n * effectiveNative * 10) / 10);
+        clip.duration = Math.max(0.2, Math.round((n * effectiveNative / (clip.speed||1)) * 10) / 10);
         durInput.value = clip.duration;
         updateHintText();
         updateTotalLabel();
@@ -2177,7 +2206,7 @@
           n = Math.max(1, Math.min(MAX_REPEAT, n));
           const cutLen = Math.max(0, (clip.cutEnd||0) - (clip.cutStart||0));
           const effectiveNative = Math.max(0.05, (clip.totalNativeMs - cutLen) / 1000);
-          clip.duration = Math.max(0.2, Math.round(n * effectiveNative * 10) / 10);
+          clip.duration = Math.max(0.2, Math.round((n * effectiveNative / (clip.speed||1)) * 10) / 10);
           durInput.value = clip.duration;
           updateHintText();
           updateTotalLabel();
@@ -2202,7 +2231,7 @@
           if(document.activeElement !== repeatInputEl){
             const cutLen = Math.max(0, (clip.cutEnd||0) - (clip.cutStart||0));
             const effectiveNative = Math.max(0.05, (clip.totalNativeMs - cutLen) / 1000);
-            const loops = clip.duration / effectiveNative;
+            const loops = (clip.duration * (clip.speed||1)) / effectiveNative;
             repeatInputEl.value = Math.min(MAX_REPEAT, Math.max(1, Math.round(loops)));
           }
           updateHintText();
@@ -2247,7 +2276,18 @@
       speedSelect.value = clip.speed || 1;
       speedSelect.addEventListener('click', e => e.stopPropagation());
       speedSelect.addEventListener('change', (e)=>{
-        clip.speed = parseFloat(e.target.value) || 1;
+        const oldSpeed = clip.speed || 1;
+        const newSpeed = parseFloat(e.target.value) || 1;
+        clip.speed = newSpeed;
+        // Keep however many loops are currently set — without this, a
+        // clip set to "repeat ×2" would silently show more/fewer loops
+        // the moment the speed changed, since duration alone doesn't
+        // track the loop count.
+        clip.duration = Math.max(0.2, Math.round(clip.duration * (oldSpeed / newSpeed) * 10) / 10);
+        if(durInput) durInput.value = clip.duration;
+        updateHintText();
+        updateTotalLabel();
+        renderTrack();
       });
 
       // The grip handle AND the thumbnail image both start a reorder drag —
@@ -2466,6 +2506,8 @@
   let previewClipStart = 0;
   let soloId = null;
 
+  let pauseStartedAt = null;
+
   function startPreview(){
     if(clips.length === 0) return;
     soloId = null;
@@ -2473,6 +2515,7 @@
     playBtn.textContent = '⏸';
     previewClipIndex = 0;
     previewClipStart = performance.now();
+    pauseStartedAt = null;
     trackPlayhead.classList.remove('hidden');
     cancelAnimationFrame(rafId);
     loop();
@@ -2480,12 +2523,37 @@
   function stopPreview(){
     playing = false;
     playBtn.textContent = '▶';
+    pauseStartedAt = null;
     trackPlayhead.classList.add('hidden');
     setTrackActive(null);
     cancelAnimationFrame(rafId);
   }
+  // A real pause: freezes the animation exactly where it is, WITHOUT
+  // hiding the playhead or resetting position — so you can still see and
+  // drag to precisely pick a cut point while stopped, instead of the old
+  // behaviour where pausing made everything disappear.
+  function pausePreview(){
+    if(!playing) return;
+    playing = false;
+    playBtn.textContent = '▶';
+    pauseStartedAt = performance.now();
+    cancelAnimationFrame(rafId);
+  }
+  function resumePreview(){
+    if(clips.length === 0) return;
+    if(pauseStartedAt !== null){
+      previewClipStart += performance.now() - pauseStartedAt; // compensate for the paused duration
+      pauseStartedAt = null;
+    }
+    soloId = null;
+    playing = true;
+    playBtn.textContent = '⏸';
+    trackPlayhead.classList.remove('hidden');
+    cancelAnimationFrame(rafId);
+    loop();
+  }
   playBtn.addEventListener('click', ()=>{
-    if(playing) stopPreview(); else startPreview();
+    if(playing) pausePreview(); else resumePreview();
   });
 
   function playSoloClip(id){
@@ -2565,6 +2633,7 @@
     soloId = null;
     previewClipIndex = idx;
     previewClipStart = performance.now() - localSec * 1000;
+    pauseStartedAt = playing ? null : performance.now();
     trackPlayhead.classList.remove('hidden');
     trackPlayhead.style.left = (frac * 100) + '%';
     setTrackActive(clips[idx].id);
@@ -2644,33 +2713,15 @@
   }
 
   // ---------- GIF export ----------
-  let workerBlobURL = null;
-
-  async function ensureWorker(){
-    if(workerBlobURL) return workerBlobURL;
-    const resp = await fetch('https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.worker.js');
-    const code = await resp.text();
-    workerBlobURL = URL.createObjectURL(new Blob([code], {type:'application/javascript'}));
-    return workerBlobURL;
-  }
-
   // Encodes a plain frames array ({imageData, delay}[]) into a standalone
   // .gif Blob — used to let the video-conversion result be downloaded
   // directly, separately from the main multi-clip "Générer" export.
+  // Implementation lives in the ffmpeg module script at the bottom of the
+  // file (window.__geekoEncodeGifFromFrames) — gif.js was dropped after
+  // repeated reports of it silently producing blank/corrupt output, a
+  // known unresolved issue in that library.
   async function encodeFramesToGif(frames, w, h){
-    const workerScript = await ensureWorker();
-    const gif = new GIF({ workers: 2, quality: 8, width: w, height: h, workerScript });
-    const tmpCanvas = document.createElement('canvas');
-    tmpCanvas.width = w; tmpCanvas.height = h;
-    const tmpCtx = tmpCanvas.getContext('2d');
-    for(const f of frames){
-      tmpCtx.putImageData(f.imageData, 0, 0);
-      gif.addFrame(tmpCtx, {copy:true, delay: f.delay});
-    }
-    return new Promise((resolve)=>{
-      gif.on('finished', blob => resolve(blob));
-      gif.render();
-    });
+    return window.__geekoEncodeGifFromFrames(frames, w, h);
   }
 
   generateBtn.addEventListener('click', generate);
@@ -2684,53 +2735,57 @@
     progressFill.style.width = '0%';
     progressText.textContent = 'Préparation…';
 
-    const workerScript = await ensureWorker();
-    const gif = new GIF({
-      workers: 2,
-      quality: 8,
-      width: outW,
-      height: outH,
-      workerScript
-    });
+    try{
+      const captureFps = 12;
+      const captureCanvas = document.createElement('canvas');
+      captureCanvas.width = outW; captureCanvas.height = outH;
+      const cctx = captureCanvas.getContext('2d');
 
-    const captureFps = 12;
-    const captureCanvas = document.createElement('canvas');
-    captureCanvas.width = outW; captureCanvas.height = outH;
-    const cctx = captureCanvas.getContext('2d');
+      // Collect every captured frame as a PNG blob at a single constant
+      // frame rate (captureFps) — a static image just repeats the same
+      // frame that many times, which keeps timing simple and correct
+      // once handed to a single-framerate GIF encode below.
+      const pngFrames = [];
+      for(let i=0; i<clips.length; i++){
+        const clip = clips[i];
+        progressText.textContent = `Capture du clip ${i+1}/${clips.length} — ${clip.name}`;
+        const isAnimated = !!(clip.frames && clip.frames.length);
+        const frameCount = Math.max(1, Math.round(clip.duration * captureFps));
 
-    for(let i=0; i<clips.length; i++){
-      const clip = clips[i];
-      progressText.textContent = `Capture du clip ${i+1}/${clips.length} — ${clip.name}`;
-      const isAnimated = !!(clip.frames && clip.frames.length);
-      const frameCount = Math.max(1, Math.round(clip.duration * (isAnimated ? captureFps : 2)));
-      const speed = clip.speed || 1;
-      const delayMs = Math.max(20, Math.round((clip.duration * 1000) / frameCount / speed));
-
-      for(let f=0; f<frameCount; f++){
-        const src = isAnimated ? frameAtTime(clip, (f/frameCount) * clip.duration * 1000) : clip.imgEl;
-        drawFitted(cctx, src, outW, outH, fitMode, bgColorInput.value, clip.crop);
-        gif.addFrame(cctx, {copy:true, delay: delayMs});
+        for(let f=0; f<frameCount; f++){
+          const src = isAnimated ? frameAtTime(clip, (f/frameCount) * clip.duration * 1000 * (clip.speed||1)) : clip.imgEl;
+          drawFitted(cctx, src, outW, outH, fitMode, bgColorInput.value, clip.crop);
+          const blob = await new Promise(res => captureCanvas.toBlob(res, 'image/png'));
+          pngFrames.push(blob);
+        }
+        await sleep(0); // yield so the progress bar/UI stays responsive
+        progressFill.style.width = (((i+1)/clips.length) * 40) + '%';
       }
-      await sleep(0); // yield so the progress bar/UI stays responsive
-      progressFill.style.width = (((i+1)/clips.length) * 50) + '%';
-    }
 
-    progressText.textContent = 'Encodage du GIF…';
+      progressText.textContent = 'Chargement du moteur GIF (première fois seulement)…';
+      const blob = await window.__geekoEncodePngFramesToGif(pngFrames, captureFps, outW, outH, (frac)=>{
+        progressText.textContent = 'Encodage du GIF…';
+        progressFill.style.width = (40 + frac*60) + '%';
+      });
 
-    gif.on('progress', p=>{
-      progressFill.style.width = (50 + p*50) + '%';
-    });
-    gif.on('finished', blob=>{
+      generateBtn.disabled = false;
+      if(!blob || blob.size < 200){
+        progressText.textContent = "Le GIF généré semble vide ou corrompu (fichier anormalement petit) — réessaie, ou dis-le moi si ça se reproduit.";
+        console.error('GIF export produced a suspiciously small/empty blob:', blob && blob.size);
+        return;
+      }
       const url = URL.createObjectURL(blob);
       downloadLink.href = url;
       const sizeKB = Math.round(blob.size/1024);
       progressText.textContent = `Terminé — ${sizeKB} Ko`;
       downloadLink.style.display = 'block';
-      generateBtn.disabled = false;
       startPreview();
-    });
-
-    gif.render();
+    }catch(err){
+      console.error('generate() export error', err);
+      const detail = (err && err.message) ? err.message : String(err);
+      progressText.textContent = `Erreur pendant l'export : ${detail} — réessaie, ou dis-le moi si ça se reproduit.`;
+      generateBtn.disabled = false;
+    }
   }
 
   function sleep(ms){ return new Promise(r=>setTimeout(r, ms)); }
@@ -3474,6 +3529,12 @@
     text.textContent = 'Encodage du GIF…';
     try{
       const blob = await encodeFramesToGif(pendingVideoFrames, pendingVideoCapW, pendingVideoCapH);
+      if(!blob || blob.size < 200){
+        text.textContent = "Le GIF généré semble vide ou corrompu (fichier anormalement petit) — réessaie.";
+        console.error('gif.js produced a suspiciously small/empty blob:', blob && blob.size);
+        btn.disabled = false;
+        return;
+      }
       const url = URL.createObjectURL(blob);
       const link = document.getElementById('videoDownloadLink');
       link.href = url;
@@ -3850,6 +3911,83 @@
   applySize();
   requestAnimationFrame(thumbLoop);
 })();
+</script>
+
+<script type="module">
+  // ---------- GIF encoding via FFmpeg.wasm (single-thread core — no
+  // cross-origin-isolation headers needed, works on plain GitHub Pages
+  // hosting). Replaces gif.js, which had repeated, never-fully-resolved
+  // reports of silently producing blank/corrupt output via its Web Worker
+  // pipeline. Palette generation here is also genuinely higher quality
+  // (ffmpeg's palettegen/paletteuse) than gif.js's built-in quantizer.
+  let ffmpegGifInstance = null;
+
+  async function ensureGifFFmpeg(){
+    if(ffmpegGifInstance) return ffmpegGifInstance;
+    const { FFmpeg } = await import('https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.10/dist/esm/index.js');
+    const { toBlobURL } = await import('https://cdn.jsdelivr.net/npm/@ffmpeg/util@0.12.1/dist/esm/index.js');
+    const instance = new FFmpeg();
+    const baseURL = 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/esm';
+    await instance.load({
+      coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
+      wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
+    });
+    ffmpegGifInstance = instance;
+    return ffmpegGifInstance;
+  }
+
+  // Used by the main multi-clip "Générer" export — frames were all
+  // captured at one constant frame rate, so a plain numbered-sequence
+  // input is enough (no per-frame duration bookkeeping needed).
+  window.__geekoEncodePngFramesToGif = async function(pngBlobs, fps, w, h, onProgress){
+    const ff = await ensureGifFFmpeg();
+    if(onProgress){
+      ff.on('progress', ({progress})=> onProgress(Math.min(1, Math.max(0, progress||0))));
+    }
+    for(let i=0; i<pngBlobs.length; i++){
+      const name = `mf${String(i).padStart(5,'0')}.png`;
+      await ff.writeFile(name, new Uint8Array(await pngBlobs[i].arrayBuffer()));
+    }
+    await ff.exec(['-framerate', String(fps), '-i', 'mf%05d.png',
+      '-vf', 'palettegen=stats_mode=diff', 'mpalette.png']);
+    await ff.exec(['-framerate', String(fps), '-i', 'mf%05d.png', '-i', 'mpalette.png',
+      '-lavfi', 'paletteuse=dither=bayer', '-loop', '0', 'mout.gif']);
+    const data = await ff.readFile('mout.gif');
+    return new Blob([data.buffer], { type: 'image/gif' });
+  };
+
+  // Used by the standalone video→GIF download — these frames come with
+  // their own individual delays (real capture timing), so this builds a
+  // concat list with an explicit duration per frame instead of assuming a
+  // constant rate.
+  window.__geekoEncodeGifFromFrames = async function(frames, w, h){
+    const ff = await ensureGifFFmpeg();
+    const listLines = [];
+    for(let i=0; i<frames.length; i++){
+      const f = frames[i];
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').putImageData(f.imageData, 0, 0);
+      const blob = await new Promise(res => canvas.toBlob(res, 'image/png'));
+      const name = `gf${String(i).padStart(5,'0')}.png`;
+      await ff.writeFile(name, new Uint8Array(await blob.arrayBuffer()));
+      const durSec = Math.max(0.02, (f.delay || 100) / 1000);
+      listLines.push(`file '${name}'`);
+      listLines.push(`duration ${durSec}`);
+    }
+    if(frames.length){
+      // ffmpeg's concat demuxer quirk: the very last "duration" line is
+      // often ignored, so the last frame gets listed again to compensate.
+      listLines.push(`file 'gf${String(frames.length-1).padStart(5,'0')}.png'`);
+    }
+    await ff.writeFile('glist.txt', new TextEncoder().encode(listLines.join('\n')));
+    await ff.exec(['-f','concat','-safe','0','-i','glist.txt',
+      '-vf','palettegen=stats_mode=diff','gpalette.png']);
+    await ff.exec(['-f','concat','-safe','0','-i','glist.txt','-i','gpalette.png',
+      '-lavfi','paletteuse=dither=bayer','-loop','0','gout.gif']);
+    const data = await ff.readFile('gout.gif');
+    return new Blob([data.buffer], { type: 'image/gif' });
+  };
 </script>
 </body>
 </html>
