@@ -595,6 +595,8 @@
     gap:10px;
     margin-bottom:8px;
   }
+  .track-toolbar .spacer{flex:1;}
+  .track-toolbar .icon-btn{font-size:13px; padding:7px 10px;}
   .track-split-btn{
     font-size:12.5px;
     padding:7px 12px;
@@ -633,6 +635,7 @@
     font-weight:800;
     font-size:11px;
     color:#FFFFFF;
+    text-shadow:0 1px 3px rgba(0,0,0,0.6);
     border-right:2px solid #fff;
     padding:0 8px;
     white-space:nowrap;
@@ -1535,6 +1538,9 @@
       <button class="ghost track-split-btn" id="splitBtn" data-i18n="splitHere">✂ Couper ici</button>
       <button class="ghost track-split-btn" id="undoDeleteBtn" style="display:none;" title="Remet le dernier clip supprimé">↩ Annuler</button>
       <span class="track-toolbar-tip">Glisse sur la piste pour te déplacer dans le montage, puis coupe au bon endroit</span>
+      <div class="spacer"></div>
+      <button class="ghost icon-btn" id="trackZoomOutBtn" title="Zoom arrière">🔍−</button>
+      <button class="ghost icon-btn" id="trackZoomInBtn" title="Zoom avant">🔍+</button>
     </div>
     <div class="track-bar-scroll">
       <div class="track-bar" id="trackBar">
@@ -2381,7 +2387,27 @@
   const trackBar = document.getElementById('trackBar');
   const trackPlayhead = document.getElementById('trackPlayhead');
   const trackColors = ['#5B5FA8', '#3D8F82', '#B4813C', '#7D89B0', '#8CA0B3'];
-  const PX_PER_SECOND = 60; // fixed scale — clips keep a stable width; only the bar's total length changes
+  let PX_PER_SECOND = 60; // adjustable via the zoom buttons — clips keep a stable width; only the bar's total length changes
+
+  // One small snapshot per clip, tiled across its segment like a filmstrip
+  // (inspired by real editors such as Clipchamp) instead of a flat block of
+  // colour — cached on the clip object so it's only drawn once.
+  function getTrackThumb(clip){
+    if(clip._trackThumb) return clip._trackThumb;
+    if(!clip.imgEl || !clip.imgEl.complete || !clip.imgEl.naturalWidth) return null;
+    try{
+      const c = document.createElement('canvas');
+      const size = 64;
+      c.width = size; c.height = size;
+      const cx = c.getContext('2d');
+      const iw = clip.imgEl.naturalWidth, ih = clip.imgEl.naturalHeight;
+      const s = Math.max(size/iw, size/ih);
+      const dw = iw*s, dh = ih*s;
+      cx.drawImage(clip.imgEl, (size-dw)/2, (size-dh)/2, dw, dh);
+      clip._trackThumb = c.toDataURL('image/jpeg', 0.7);
+    }catch(err){ return null; }
+    return clip._trackThumb;
+  }
 
   function renderTrack(){
     trackBar.innerHTML = '';
@@ -2404,7 +2430,14 @@
       seg.className = 'track-seg';
       seg.dataset.id = clip.id;
       seg.style.width = (clip.duration * PX_PER_SECOND) + 'px';
-      seg.style.background = trackColors[idx % trackColors.length];
+      const thumb = getTrackThumb(clip);
+      if(thumb){
+        seg.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.15),rgba(0,0,0,0.35)), url(${thumb})`;
+        seg.style.backgroundSize = `${PX_PER_SECOND}px 100%, ${PX_PER_SECOND}px 100%`;
+        seg.style.backgroundRepeat = 'repeat-x, repeat-x';
+      } else {
+        seg.style.background = trackColors[idx % trackColors.length];
+      }
       seg.innerHTML = `<span class="n">${idx+1}</span><span class="t">${escapeHtml(clip.name)} · ${clip.duration.toFixed(1)}s</span>` +
         `<div class="track-handle track-handle-left" title="Glisser pour raccourcir/allonger"></div>` +
         `<div class="track-handle track-handle-right" title="Glisser pour raccourcir/allonger"></div>`;
@@ -2537,6 +2570,17 @@
     generateBtn.disabled = clips.length === 0;
   }
   undoDeleteBtn.addEventListener('click', undoDelete);
+
+  const trackZoomInBtn = document.getElementById('trackZoomInBtn');
+  const trackZoomOutBtn = document.getElementById('trackZoomOutBtn');
+  trackZoomInBtn.addEventListener('click', ()=>{
+    PX_PER_SECOND = Math.min(160, PX_PER_SECOND + 20);
+    renderTrack();
+  });
+  trackZoomOutBtn.addEventListener('click', ()=>{
+    PX_PER_SECOND = Math.max(20, PX_PER_SECOND - 20);
+    renderTrack();
+  });
 
   // Delete/Backspace removes whichever clip the playhead is currently on —
   // the same clip "Couper ici" would operate on — but never while the
