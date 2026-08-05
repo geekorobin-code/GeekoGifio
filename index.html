@@ -607,6 +607,12 @@
     color:var(--muted);
     font-weight:600;
   }
+  .track-bar-scroll{
+    overflow-x:auto;
+    overflow-y:hidden;
+    border-radius:14px;
+    box-shadow:var(--m3-elev-1);
+  }
   .track-bar{
     position:relative;
     display:flex;
@@ -614,7 +620,6 @@
     border-radius:14px;
     overflow:hidden;
     background:var(--panel);
-    box-shadow:var(--m3-elev-1);
     cursor:pointer;
     touch-action:none;
   }
@@ -1528,10 +1533,13 @@
   <div class="track-wrap">
     <div class="track-toolbar">
       <button class="ghost track-split-btn" id="splitBtn" data-i18n="splitHere">✂ Couper ici</button>
+      <button class="ghost track-split-btn" id="undoDeleteBtn" style="display:none;" title="Remet le dernier clip supprimé">↩ Annuler</button>
       <span class="track-toolbar-tip">Glisse sur la piste pour te déplacer dans le montage, puis coupe au bon endroit</span>
     </div>
-    <div class="track-bar" id="trackBar">
-      <div class="track-playhead hidden" id="trackPlayhead"></div>
+    <div class="track-bar-scroll">
+      <div class="track-bar" id="trackBar">
+        <div class="track-playhead hidden" id="trackPlayhead"></div>
+      </div>
     </div>
   </div>
 
@@ -1754,11 +1762,15 @@
             clip.totalNativeMs = decoded.frames.reduce((s,f)=>s+f.delay, 0) || 1;
             clip.nativeDuration = clip.totalNativeMs / 1000;
             clip.frameCount = decoded.frames.length;
-            // Only reset the cut window to "nothing removed" for a FRESH
-            // upload — a restored clip keeps whatever was saved.
+            // Only reset the cut window / default duration for a FRESH
+            // upload — a restored clip (from autosave) keeps whatever was
+            // saved. A fresh clip defaults to exactly one full native loop
+            // instead of a flat 2s, which used to chop the animation off
+            // mid-cycle for anything longer than 2 seconds.
             if(!overrides){
               clip.cutStart = 0;
               clip.cutEnd = 0;
+              clip.duration = Math.min(30, Math.max(0.2, Math.round(clip.nativeDuration * 10) / 10));
             }
             clip.frameCanvas = document.createElement('canvas');
             clip.frameCanvas.width = decoded.width;
@@ -2369,6 +2381,7 @@
   const trackBar = document.getElementById('trackBar');
   const trackPlayhead = document.getElementById('trackPlayhead');
   const trackColors = ['#5B5FA8', '#3D8F82', '#B4813C', '#7D89B0', '#8CA0B3'];
+  const PX_PER_SECOND = 60; // fixed scale — clips keep a stable width; only the bar's total length changes
 
   function renderTrack(){
     trackBar.innerHTML = '';
@@ -2376,16 +2389,21 @@
     if(clips.length === 0){
       const msg = document.createElement('div');
       msg.className = 'track-empty-msg';
-      msg.textContent = 'Ta piste de montage apparaîtra ici, proportionnelle à la durée de chaque clip';
+      msg.textContent = 'Ta piste de montage apparaîtra ici, un clip après l\'autre';
       trackBar.appendChild(msg);
+      trackBar.style.width = '100%';
       return;
     }
     const total = clips.reduce((s,c)=>s+c.duration, 0) || 1;
+    const scrollWrap = trackBar.parentElement;
+    const wrapWidth = (scrollWrap && scrollWrap.clientWidth) || 0;
+    trackBar.style.width = Math.max(wrapWidth, total * PX_PER_SECOND) + 'px';
+
     clips.forEach((clip, idx)=>{
       const seg = document.createElement('div');
       seg.className = 'track-seg';
       seg.dataset.id = clip.id;
-      seg.style.width = ((clip.duration/total)*100) + '%';
+      seg.style.width = (clip.duration * PX_PER_SECOND) + 'px';
       seg.style.background = trackColors[idx % trackColors.length];
       seg.innerHTML = `<span class="n">${idx+1}</span><span class="t">${escapeHtml(clip.name)} · ${clip.duration.toFixed(1)}s</span>` +
         `<div class="track-handle track-handle-left" title="Glisser pour raccourcir/allonger"></div>` +
@@ -2402,7 +2420,9 @@
 
   // Dragging either edge of a clip's block on the track shortens or lengthens
   // that clip's own duration directly — no snapping to the GIF's loop point,
-  // it can cut the animation mid-cycle and that's fine.
+  // it can cut the animation mid-cycle and that's fine. At a fixed scale,
+  // this only ever touches the dragged clip's own segment — the others stay
+  // put instead of visually reflowing, which was confusing before.
   function attachTrackHandleDrag(handleEl, clip, side){
     handleEl.addEventListener('click', e => e.stopPropagation());
     handleEl.addEventListener('pointerdown', (e)=>{
@@ -2410,15 +2430,12 @@
       e.stopPropagation();
       handleEl.setPointerCapture(e.pointerId);
 
-      const total = clips.reduce((s,c)=>s+c.duration, 0) || 1;
-      const trackWidthPx = trackBar.clientWidth || 1;
-      const pxPerSecond = trackWidthPx / total;
       const startX = e.clientX;
       const startDuration = clip.duration;
 
       function onMove(ev){
         const deltaPx = ev.clientX - startX;
-        const deltaSec = deltaPx / pxPerSecond;
+        const deltaSec = deltaPx / PX_PER_SECOND;
         const raw = (side === 'right') ? (startDuration + deltaSec) : (startDuration - deltaSec);
         clip.duration = Math.min(30, Math.max(0.2, raw));
         updateTrackWidthsLive();
@@ -2433,14 +2450,19 @@
     });
   }
 
-  // Lightweight live update used WHILE dragging a handle — updates widths and
-  // labels in place without rebuilding the DOM (which would kill the drag).
+  // Lightweight live update used WHILE dragging a handle — updates only the
+  // dragged clip's own width/label plus the bar's total length, without
+  // rebuilding the DOM (which would kill the drag) and without touching any
+  // other clip's segment.
   function updateTrackWidthsLive(){
     const total = clips.reduce((s,c)=>s+c.duration, 0) || 1;
+    const scrollWrap = trackBar.parentElement;
+    const wrapWidth = (scrollWrap && scrollWrap.clientWidth) || 0;
+    trackBar.style.width = Math.max(wrapWidth, total * PX_PER_SECOND) + 'px';
     clips.forEach(clip=>{
       const seg = trackBar.querySelector(`.track-seg[data-id="${clip.id}"]`);
       if(seg){
-        seg.style.width = ((clip.duration/total)*100) + '%';
+        seg.style.width = (clip.duration * PX_PER_SECOND) + 'px';
         const tEl = seg.querySelector('.t');
         if(tEl) tEl.textContent = `${clip.name} · ${clip.duration.toFixed(1)}s`;
       }
@@ -2473,14 +2495,27 @@
     renderTimeline();
   }
 
+  let lastDeletedClip = null; // { clip, index } — kept alive (not revoked) until overwritten, so Undo can restore it
+  const undoDeleteBtn = document.getElementById('undoDeleteBtn');
+
   function removeClip(id){
-    const clip = clips.find(c=>c.id===id);
-    if(clip){
-      if(clip.imgEl) clip.imgEl.remove();
-      const stillShared = clips.some(c=>c.id !== id && c.url === clip.url);
-      if(!stillShared) URL.revokeObjectURL(clip.url);
+    const idx = clips.findIndex(c=>c.id===id);
+    if(idx === -1) return;
+    const clip = clips[idx];
+
+    // Free the PREVIOUS undo buffer now that it's about to be replaced —
+    // only the most recent deletion stays undoable.
+    if(lastDeletedClip){
+      const stillShared = clips.some(c=>c.url===lastDeletedClip.clip.url) || lastDeletedClip.clip.url===clip.url;
+      if(!stillShared) URL.revokeObjectURL(lastDeletedClip.clip.url);
+      if(lastDeletedClip.clip.imgEl) lastDeletedClip.clip.imgEl.remove();
     }
-    clips = clips.filter(c=>c.id!==id);
+
+    if(clip.imgEl) clip.imgEl.remove(); // detach from the pool, but keep the object + blob URL alive for undo
+    clips.splice(idx, 1);
+    lastDeletedClip = { clip, index: idx };
+    undoDeleteBtn.style.display = 'inline-flex';
+
     renderTimeline();
     generateBtn.disabled = clips.length === 0;
     if(clips.length === 0){
@@ -2489,6 +2524,33 @@
       clipLabel.textContent = 'Aucun clip';
     }
   }
+
+  function undoDelete(){
+    if(!lastDeletedClip) return;
+    const { clip, index } = lastDeletedClip;
+    const insertAt = Math.min(index, clips.length);
+    clips.splice(insertAt, 0, clip);
+    if(clip.imgEl) imgPool.appendChild(clip.imgEl);
+    lastDeletedClip = null;
+    undoDeleteBtn.style.display = 'none';
+    renderTimeline();
+    generateBtn.disabled = clips.length === 0;
+  }
+  undoDeleteBtn.addEventListener('click', undoDelete);
+
+  // Delete/Backspace removes whichever clip the playhead is currently on —
+  // the same clip "Couper ici" would operate on — but never while the
+  // person is typing in a field (name, duration, repeat count, etc.).
+  window.addEventListener('keydown', (e)=>{
+    if(e.key !== 'Delete' && e.key !== 'Backspace') return;
+    const tag = (e.target.tagName || '').toLowerCase();
+    const isEditable = tag === 'input' || tag === 'textarea' || tag === 'select' || e.target.isContentEditable;
+    if(isEditable) return;
+    if(clips.length === 0) return;
+    e.preventDefault();
+    const clip = clips[previewClipIndex];
+    if(clip) removeClip(clip.id);
+  });
 
   function updateTotalLabel(){
     const total = clips.reduce((s,c)=>s+c.duration, 0);
@@ -3928,9 +3990,15 @@
     const { toBlobURL } = await import('https://cdn.jsdelivr.net/npm/@ffmpeg/util@0.12.1/dist/esm/index.js');
     const instance = new FFmpeg();
     const baseURL = 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/esm';
+    const ffmpegBaseURL = 'https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.10/dist/esm';
     await instance.load({
       coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
       wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
+      // The FFmpeg wrapper library itself spawns its own internal worker
+      // (separate from the core engine above) — without blob-ifying this
+      // too, the browser refuses to load it because it comes from a
+      // different origin (the CDN) than the page itself.
+      classWorkerURL: await toBlobURL(`${ffmpegBaseURL}/worker.js`, 'text/javascript'),
     });
     ffmpegGifInstance = instance;
     return ffmpegGifInstance;
