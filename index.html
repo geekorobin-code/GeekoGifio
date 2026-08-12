@@ -3074,9 +3074,25 @@
     }
   }
 
+  let cropMinScale = 1; // recomputed per-image in openCropModal — how far the slider can go below 100% to show the whole thing
+
   function openCropModal(clip){
     cropClip = clip;
     cropWorking = { ...(clip.crop || {scale:1, offsetX:0.5, offsetY:0.5, rotation:0, flipH:false, flipV:false}) };
+
+    // For a wide/sparse image, "100%" in cover mode can already crop away
+    // a lot — let the slider go low enough to see the whole picture instead
+    // of bottoming out at a crop that can never show everything.
+    cropMinScale = 1;
+    const dims = getClipDims(clip);
+    if(dims && dims.w && dims.h){
+      const w = cropCanvas.width || 1, h = cropCanvas.height || 1;
+      const coverScale = Math.max(w/dims.w, h/dims.h);
+      const containScale = Math.min(w/dims.w, h/dims.h);
+      if(coverScale > 0) cropMinScale = Math.min(1, containScale / coverScale);
+    }
+    cropZoom.min = cropMinScale.toFixed(3);
+    cropWorking.scale = Math.max(cropMinScale, cropWorking.scale || 1);
     cropZoom.value = cropWorking.scale;
     cropPlaying = true;
     cropPlayBtn.textContent = '⏸';
@@ -3101,6 +3117,17 @@
     cropCanvas.height = frameH;
     cropCanvas.style.width = frameW + 'px';
     cropCanvas.style.height = frameH + 'px';
+
+    // Canvas size just changed, so the min-scale computed above (based on
+    // the previous canvas size) needs to be redone against the real one.
+    if(dims && dims.w && dims.h){
+      const coverScale = Math.max(frameW/dims.w, frameH/dims.h);
+      const containScale = Math.min(frameW/dims.w, frameH/dims.h);
+      if(coverScale > 0) cropMinScale = Math.min(1, containScale / coverScale);
+      cropZoom.min = cropMinScale.toFixed(3);
+      cropWorking.scale = Math.max(cropMinScale, cropWorking.scale || 1);
+      cropZoom.value = cropWorking.scale;
+    }
 
     cropModal.classList.add('open');
     cancelAnimationFrame(cropRafId);
@@ -3178,7 +3205,7 @@
     if(!cropClip) return;
     e.preventDefault();
     const delta = e.deltaY > 0 ? -0.1 : 0.1;
-    cropWorking.scale = Math.min(3, Math.max(1, cropWorking.scale + delta));
+    cropWorking.scale = Math.min(3, Math.max(cropMinScale, cropWorking.scale + delta));
     cropZoom.value = cropWorking.scale;
     renderCropCanvasOnce();
   }, { passive: false });
