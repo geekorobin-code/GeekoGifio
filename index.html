@@ -1701,9 +1701,10 @@
   sizePreset.addEventListener('change', () => {
     customSizeFields.style.display = sizePreset.value === 'custom' ? 'grid' : 'none';
     applySize();
+    savePrefs();
   });
-  customW.addEventListener('input', applySize);
-  customH.addEventListener('input', applySize);
+  customW.addEventListener('input', ()=>{ applySize(); savePrefs(); });
+  customH.addEventListener('input', ()=>{ applySize(); savePrefs(); });
 
   document.querySelectorAll('.segmented button').forEach(btn=>{
     btn.addEventListener('click', ()=>{
@@ -1712,8 +1713,48 @@
       fitMode = btn.dataset.fit;
       bgColorField.style.display = fitMode === 'contain' ? 'block' : 'none';
       drawCurrentFrame();
+      savePrefs();
     });
   });
+  bgColorInput.addEventListener('input', ()=>{ drawCurrentFrame(); savePrefs(); });
+
+  // ---------- Output settings that stick around between visits ----------
+  // Separate from the clip autosave/restore banner on purpose — the person
+  // shouldn't have to restore an old montage just to keep their screen
+  // size choice; it's a durable preference, not project data.
+  const PREFS_KEY = 'geekogifio_output_prefs_v1';
+  function savePrefs(){
+    try{
+      localStorage.setItem(PREFS_KEY, JSON.stringify({
+        sizePreset: sizePreset.value,
+        customW: customW.value,
+        customH: customH.value,
+        fitMode,
+        bgColor: bgColorInput.value
+      }));
+    }catch(err){}
+  }
+  function loadPrefs(){
+    let saved = null;
+    try{ saved = JSON.parse(localStorage.getItem(PREFS_KEY) || 'null'); }catch(err){}
+    if(!saved) return;
+    if(saved.sizePreset){
+      sizePreset.value = saved.sizePreset;
+      customSizeFields.style.display = saved.sizePreset === 'custom' ? 'grid' : 'none';
+    }
+    if(saved.customW) customW.value = saved.customW;
+    if(saved.customH) customH.value = saved.customH;
+    if(saved.bgColor) bgColorInput.value = saved.bgColor;
+    if(saved.fitMode){
+      fitMode = saved.fitMode;
+      document.querySelectorAll('.segmented button').forEach(b=>{
+        b.classList.toggle('active', b.dataset.fit === saved.fitMode);
+      });
+      bgColorField.style.display = saved.fitMode === 'contain' ? 'block' : 'none';
+    }
+    applySize();
+  }
+  loadPrefs();
 
   // ---------- File handling ----------
   // Two separate inputs so the phone's native picker can actually filter:
