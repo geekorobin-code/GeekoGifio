@@ -1752,6 +1752,18 @@
     }
   });
 
+  // Dropping anywhere else on the page (not just the two zones above) still
+  // adds the files — without this, the browser's default behaviour for an
+  // unhandled drop is to just open the image/GIF directly in the tab.
+  window.addEventListener('dragover', e=>{ e.preventDefault(); });
+  window.addEventListener('drop', e=>{
+    e.preventDefault();
+    if(dropzone.contains(e.target) || canvasWrap.contains(e.target)) return; // already handled above
+    if(e.dataTransfer.files && e.dataTransfer.files.length){
+      handleFiles(e.dataTransfer.files);
+    }
+  });
+
   // overrides lets autosave-restore reapply saved duration/crop/speed/cut
   // once decode completes, instead of the normal fresh defaults.
   function addClipFromFile(file, overrides){
