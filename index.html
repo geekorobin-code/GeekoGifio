@@ -1575,7 +1575,7 @@
   </div>
 
   <div id="dropzone" data-i18n="dropzoneText">Glisse tes GIF ou images ici, ou clique pour parcourir — puis réordonne-les et ajuste la durée de chacun</div>
-  <input type="file" id="fileInput" accept="image/gif" multiple style="display:none;">
+  <input type="file" id="fileInput" accept="image/gif,image/webp" multiple style="display:none;">
   <input type="file" id="fileInputImages" accept="image/*" multiple style="display:none;">
 
   <div id="timeline"></div>
@@ -1871,8 +1871,56 @@
         renderTimeline();
         scheduleAutosave();
       }).catch(()=>{});
+    } else if(file.type === 'image/webp'){
+      // No pixel-level frame splitting for WebP (that needs a full VP8/VP8L
+      // decoder) — but the animation itself already plays fine through the
+      // browser's own <img> element (resolveSource() falls back to imgEl
+      // whenever clip.frames is empty). All that's missing without this is
+      // the correct native duration, so it doesn't default to a generic 2s
+      // that may not match the real loop length — this reads just the RIFF
+      // container's ANMF chunk durations, no pixel decoding needed.
+      file.arrayBuffer().then(buf=>{
+        try{
+          const info = getWebpAnimationInfo(buf);
+          if(info && info.totalMs > 0){
+            clip.totalNativeMs = info.totalMs;
+            clip.nativeDuration = info.totalMs / 1000;
+            clip.frameCount = info.frameCount;
+            if(!overrides){
+              clip.duration = Math.min(30, Math.max(0.2, Math.round(clip.nativeDuration * 10) / 10));
+            }
+          }
+        }catch(err){
+          // not an animated WebP (or parsing failed) — treated as a static image, which is still correct
+        }
+        renderTimeline();
+        scheduleAutosave();
+      }).catch(()=>{});
     }
     return clip;
+  }
+
+  // Reads just enough of the WebP RIFF container to sum up each animation
+  // frame's duration (the ANMF chunk's 24-bit little-endian duration field,
+  // in milliseconds) — deliberately not decoding any pixel data.
+  function getWebpAnimationInfo(buf){
+    const view = new DataView(buf);
+    if(view.byteLength < 16) return null;
+    const fourcc = (off)=> String.fromCharCode(view.getUint8(off),view.getUint8(off+1),view.getUint8(off+2),view.getUint8(off+3));
+    if(fourcc(0) !== 'RIFF' || fourcc(8) !== 'WEBP') return null;
+    let offset = 12, totalMs = 0, frameCount = 0;
+    while(offset + 8 <= view.byteLength){
+      const chunkId = fourcc(offset);
+      const size = view.getUint32(offset+4, true);
+      const dataStart = offset + 8;
+      if(chunkId === 'ANMF' && dataStart + 15 <= view.byteLength){
+        const d = view.getUint8(dataStart+12) | (view.getUint8(dataStart+13)<<8) | (view.getUint8(dataStart+14)<<16);
+        totalMs += d;
+        frameCount++;
+      }
+      offset = dataStart + size + (size % 2); // chunks are padded to an even byte length
+    }
+    return frameCount > 0 ? { totalMs, frameCount } : null;
   }
 
   function handleFiles(fileList){
@@ -2334,10 +2382,10 @@
             repeatInputEl.value = Math.min(MAX_REPEAT, Math.max(1, Math.round(loops)));
           }
           updateHintText();
-        } else if(clip.type === 'image/gif'){
+        } else if(clip.type === 'image/gif' || clip.type === 'image/webp'){
           repeatRowEl.innerHTML = '';
           repeatInputEl = null;
-          hintEl.textContent = 'Analyse du GIF…';
+          hintEl.textContent = 'Analyse…';
         } else {
           repeatRowEl.innerHTML = '';
           repeatInputEl = null;
