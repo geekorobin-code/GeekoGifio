@@ -275,7 +275,7 @@
     main.layout{gap:12px;}
     .panel{padding:14px;}
     .canvas-wrap{padding:16px; min-height:260px;}
-    .clip-card{flex:0 0 148px;}
+    :root{--card-w:148px;}
     .crop-panel{padding:16px; border-radius:18px;}
     .crop-transform-row button{min-width:0; font-size:11px; padding:8px 4px;}
     .track-toolbar{flex-wrap:wrap;}
@@ -607,6 +607,7 @@
     margin-bottom:8px;
   }
   .track-toolbar .spacer{flex:1;}
+  .timeline-header .spacer{flex:1;}
   .track-toolbar .icon-btn{font-size:13px; padding:7px 10px;}
   .track-split-btn{
     font-size:12.5px;
@@ -769,7 +770,7 @@
     display:block;
   }
   .clip-card{
-    flex:0 0 172px;
+    flex:0 0 var(--card-w, 172px);
     background:var(--panel);
     border:none;
     border-radius:var(--m3-shape-md);
@@ -777,7 +778,7 @@
     position:relative;
     cursor:grab;
     box-shadow:var(--m3-elev-1);
-    transition:transform .15s, box-shadow .15s;
+    transition:transform .15s, box-shadow .15s, flex-basis .12s ease;
   }
   .clip-card.dragging{
     opacity:0.96;
@@ -1550,6 +1551,9 @@
   <div class="timeline-header">
     <h2 data-i18n="montageTitle">Montage</h2>
     <span class="count-badge" id="countBadge">0 clip</span>
+    <div class="spacer"></div>
+    <button class="ghost icon-btn" id="cardZoomOutBtn" title="Cartes plus petites">🔍−</button>
+    <button class="ghost icon-btn" id="cardZoomInBtn" title="Cartes plus grandes">🔍+</button>
     <button class="ghost" id="addBtn" data-i18n="addGif">🎞️ Ajouter des GIF</button>
     <button class="ghost" id="addImageBtn" data-i18n="addImage">+ image fixe</button>
   </div>
@@ -2191,7 +2195,7 @@
       const hintEl = card.querySelector('.loop-hint');
       const repeatRowEl = card.querySelector('.repeat-row');
       const durInput = card.querySelector('input');
-      const MAX_REPEAT = 10;
+      const MAX_REPEAT = 999;
 
       let repeatInputEl = null;
 
@@ -2357,12 +2361,39 @@
             });
           }
 
+          // Auto-scrolls the track while dragging near its left/right edge,
+          // so reaching a clip far off-screen doesn't require manually
+          // scrolling first — runs on its own loop so it keeps scrolling
+          // even if the pointer stops moving right at the edge.
+          let lastPointerX = null;
+          let autoScrollRAF = null;
+          function autoScrollTick(){
+            if(lastPointerX == null){ autoScrollRAF = null; return; }
+            const rect = timelineEl.getBoundingClientRect();
+            const edgeZone = 70;
+            let speed = 0;
+            if(lastPointerX < rect.left + edgeZone){
+              speed = -Math.max(2, (edgeZone - (lastPointerX - rect.left)) / 2.5);
+            } else if(lastPointerX > rect.right - edgeZone){
+              speed = Math.max(2, (edgeZone - (rect.right - lastPointerX)) / 2.5);
+            }
+            if(speed !== 0) timelineEl.scrollLeft += speed;
+            autoScrollRAF = requestAnimationFrame(autoScrollTick);
+          }
+          function stopAutoScroll(){
+            lastPointerX = null;
+            if(autoScrollRAF){ cancelAnimationFrame(autoScrollRAF); autoScrollRAF = null; }
+          }
+
           function onMove(ev){
             moved = true;
             // Purely visual — doesn't touch the DOM position, so it can't
             // interrupt the touch gesture the way reordering mid-drag did.
             const dx = ev.clientX - startX, dy = ev.clientY - startY;
             card.style.transform = `translate(${dx}px, ${dy}px) scale(1.04)`;
+
+            lastPointerX = ev.clientX;
+            if(!autoScrollRAF) autoScrollRAF = requestAnimationFrame(autoScrollTick);
 
             const afterEl = getDragAfterElement(timelineEl, ev.clientX);
             if(afterEl === currentAfterEl) return;
@@ -2379,6 +2410,7 @@
           function onUp(){
             window.removeEventListener('pointermove', onMove);
             window.removeEventListener('pointerup', onUp);
+            stopAutoScroll();
             clearIndicators();
             card.classList.remove('dragging');
             card.style.transform = '';
@@ -2632,6 +2664,21 @@
     PX_PER_SECOND = Math.max(20, PX_PER_SECOND - 20);
     renderTrack();
   });
+
+  // ---------- Clip card grid zoom (separate from the track bar's own zoom) ----------
+  const cardZoomInBtn = document.getElementById('cardZoomInBtn');
+  const cardZoomOutBtn = document.getElementById('cardZoomOutBtn');
+  function currentCardWidth(){
+    const raw = getComputedStyle(document.documentElement).getPropertyValue('--card-w').trim();
+    const n = parseFloat(raw);
+    return isNaN(n) ? 172 : n;
+  }
+  function setCardWidth(px){
+    px = Math.min(240, Math.max(100, px));
+    document.documentElement.style.setProperty('--card-w', px + 'px');
+  }
+  cardZoomInBtn.addEventListener('click', ()=> setCardWidth(currentCardWidth() + 24));
+  cardZoomOutBtn.addEventListener('click', ()=> setCardWidth(currentCardWidth() - 24));
 
   // Delete/Backspace removes whichever clip the playhead is currently on —
   // the same clip "Couper ici" would operate on — but never while the
