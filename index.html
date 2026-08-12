@@ -363,6 +363,16 @@
   button.primary:hover{filter:brightness(1.05); box-shadow:var(--m3-elev-3);}
   button.primary:active{box-shadow:var(--m3-elev-1);}
   button.primary:disabled{background:var(--panel-alt);color:#B4B7C4;box-shadow:none;cursor:not-allowed;}
+  button.danger-fab{
+    background:var(--danger);
+    color:#FFFFFF;
+    font-size:14px;
+    font-weight:700;
+    padding:12px 22px;
+    box-shadow:var(--m3-elev-1);
+  }
+  button.danger-fab:hover{filter:brightness(1.1); box-shadow:var(--m3-elev-3);}
+  button.danger-fab:active{box-shadow:var(--m3-elev-1);}
   .m3-fab{
     font-size:14.5px;
     padding:14px 24px;
@@ -1531,6 +1541,8 @@
     <a id="downloadLink" download="montage.gif">
       <button class="ghost" style="width:100%;">⬇ Télécharger le GIF</button>
     </a>
+
+    <button class="danger-fab" id="resetAllBtn" style="width:100%; margin-top:14px;">🗑 On recommence tout</button>
   </aside>
 </main>
 
@@ -2435,7 +2447,7 @@
     const total = clips.reduce((s,c)=>s+c.duration, 0) || 1;
     const scrollWrap = trackBar.parentElement;
     const wrapWidth = (scrollWrap && scrollWrap.clientWidth) || 0;
-    trackBar.style.width = Math.max(wrapWidth, total * PX_PER_SECOND) + 'px';
+    trackBar.style.width = (total * PX_PER_SECOND) + 'px'; // never padded wider than the content — that was throwing off click-position math when zoomed out
 
     clips.forEach((clip, idx)=>{
       const seg = document.createElement('div');
@@ -2503,7 +2515,7 @@
     const total = clips.reduce((s,c)=>s+c.duration, 0) || 1;
     const scrollWrap = trackBar.parentElement;
     const wrapWidth = (scrollWrap && scrollWrap.clientWidth) || 0;
-    trackBar.style.width = Math.max(wrapWidth, total * PX_PER_SECOND) + 'px';
+    trackBar.style.width = (total * PX_PER_SECOND) + 'px'; // never padded wider than the content — that was throwing off click-position math when zoomed out
     clips.forEach(clip=>{
       const seg = trackBar.querySelector(`.track-seg[data-id="${clip.id}"]`);
       if(seg){
@@ -2582,6 +2594,33 @@
     generateBtn.disabled = clips.length === 0;
   }
   undoDeleteBtn.addEventListener('click', undoDelete);
+
+  const resetAllBtn = document.getElementById('resetAllBtn');
+  resetAllBtn.addEventListener('click', ()=>{
+    if(clips.length === 0) return;
+    const ok = window.confirm('Supprimer tous les clips et repartir de zéro ? Cette action est irréversible.');
+    if(!ok) return;
+
+    const seenUrls = new Set();
+    clips.forEach(c=>{
+      if(c.imgEl) c.imgEl.remove();
+      if(!seenUrls.has(c.url)){ seenUrls.add(c.url); URL.revokeObjectURL(c.url); }
+    });
+    if(lastDeletedClip){
+      if(lastDeletedClip.clip.imgEl) lastDeletedClip.clip.imgEl.remove();
+      if(!seenUrls.has(lastDeletedClip.clip.url)) URL.revokeObjectURL(lastDeletedClip.clip.url);
+    }
+    clips = [];
+    lastDeletedClip = null;
+    undoDeleteBtn.style.display = 'none';
+
+    renderTimeline();
+    generateBtn.disabled = true;
+    stopPreview();
+    ctx.clearRect(0,0,previewCanvas.width, previewCanvas.height);
+    clipLabel.textContent = 'Aucun clip';
+    clearAutosave(); // otherwise reloading the page would bring everything back
+  });
 
   const trackZoomInBtn = document.getElementById('trackZoomInBtn');
   const trackZoomOutBtn = document.getElementById('trackZoomOutBtn');
@@ -2765,12 +2804,16 @@
     scrubbing = true;
     trackBar.setPointerCapture(e.pointerId);
     const rect = trackBar.getBoundingClientRect();
-    scrubToFraction((e.clientX - rect.left) / rect.width);
+    const total = clips.reduce((s,c)=>s+c.duration, 0) || 1;
+    const contentWidth = Math.min(rect.width, total * PX_PER_SECOND) || rect.width;
+    scrubToFraction((e.clientX - rect.left) / contentWidth);
   });
   trackBar.addEventListener('pointermove', (e)=>{
     if(!scrubbing) return;
     const rect = trackBar.getBoundingClientRect();
-    scrubToFraction((e.clientX - rect.left) / rect.width);
+    const total = clips.reduce((s,c)=>s+c.duration, 0) || 1;
+    const contentWidth = Math.min(rect.width, total * PX_PER_SECOND) || rect.width;
+    scrubToFraction((e.clientX - rect.left) / contentWidth);
   });
   window.addEventListener('pointerup', ()=>{ scrubbing = false; });
 
